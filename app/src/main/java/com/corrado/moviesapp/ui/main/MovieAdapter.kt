@@ -6,7 +6,9 @@ import android.view.ViewGroup
 import com.corrado.moviesapp.R
 import com.corrado.moviesapp.ui.main.api.model.Movie
 
-class MovieAdapter(var movieList: List<Movie>) : RecyclerView.Adapter<MovieViewHolder>() {
+class MovieAdapter(
+    private var movieList: List<Movie>,
+    private val listener: (Movie) -> Unit) : RecyclerView.Adapter<MovieViewHolder>() {
 
     override fun getItemCount(): Int {
         return movieList.size
@@ -18,7 +20,8 @@ class MovieAdapter(var movieList: List<Movie>) : RecyclerView.Adapter<MovieViewH
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
-        val post = movieList[position]
-        holder.bind(post)
+        val movie = movieList[position]
+        holder.bind(movie)
+        holder.itemView.setOnClickListener { listener(movie) }
     }
 }

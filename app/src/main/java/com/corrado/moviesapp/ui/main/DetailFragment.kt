@@ -8,67 +8,65 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.fragment.navArgs
 import com.corrado.moviesapp.R
 import com.corrado.moviesapp.ui.main.api.ApiBuilder
 import com.corrado.moviesapp.ui.main.api.ApiHelper
 import com.corrado.moviesapp.ui.main.utils.Status
 import com.corrado.moviesapp.ui.main.utils.ViewModelFactory
 
-class MainFragment : Fragment() {
+class DetailFragment : Fragment() {
 
     companion object {
-        fun newInstance() = MainFragment()
-        const val TAG = "MainFragment"
+        const val TAG = "DetailFragment"
     }
 
     private lateinit var viewModel: MainViewModel
+    val args by navArgs<DetailFragmentArgs>()
 
-    private var recyclerView: RecyclerView? = null
+    private var titleTextView: TextView? = null
+    private var bodyTextView: TextView? = null
+    private var containerView: View? = null
     private var progressBar: ProgressBar? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        val view = inflater.inflate(R.layout.main_fragment, container, false)
-        recyclerView = view.findViewById(R.id.recycler_view)
-        recyclerView?.layoutManager = LinearLayoutManager(context)
+        val view = inflater.inflate(R.layout.detail_fragment, container, false)
+        titleTextView = view.findViewById(R.id.title_textView)
+        bodyTextView = view.findViewById(R.id.body_textView)
         progressBar = view.findViewById(R.id.progress_bar)
+        containerView = view.findViewById(R.id.container)
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val movieId = args.movieId
         viewModel = ViewModelProviders.of(
             this,
             ViewModelFactory(ApiHelper(ApiBuilder.apiService))
         ).get(MainViewModel::class.java)
-        viewModel.getPopularMovies().observe(viewLifecycleOwner, Observer {
+        viewModel.getMovie(movieId).observe(this.viewLifecycleOwner, Observer {
             it?.let { result ->
                 when (result.status) {
                     Status.SUCCESS -> {
-                        result.data?.let { movieList ->
-                            recyclerView?.adapter = movieList.results?.let { it1 -> MovieAdapter(it1) { movie ->
-                                val action = MainFragmentDirections.actionMainFragmentToDetailFragment(movie.id!!)
-                                this.findNavController().navigate(action)
-                            } }
+                        result.data?.let { movie ->
+                            containerView?.visibility = View.VISIBLE
                             progressBar?.visibility = View.GONE
-                            recyclerView?.visibility = View.VISIBLE
+                            titleTextView?.text = movie.title
+                            bodyTextView?.text = movie.overview
                         }
                     }
                     Status.ERROR -> {
                         Log.e(TAG, "Failed to load popular movies")
                         progressBar?.visibility = View.GONE
-                        recyclerView?.visibility = View.VISIBLE
                         Toast.makeText(context, "There was an error loading movies. Try again later.", Toast.LENGTH_SHORT).show()
                     }
                     Status.LOADING -> {
                         progressBar?.visibility = View.VISIBLE
-                        recyclerView?.visibility = View.GONE
                     }
                 }
             }

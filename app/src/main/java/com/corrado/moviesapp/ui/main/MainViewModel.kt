@@ -1,5 +1,6 @@
 package com.corrado.moviesapp.ui.main
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.corrado.moviesapp.ui.main.api.Repository
@@ -8,6 +9,12 @@ import com.corrado.moviesapp.ui.main.utils.Result
 import kotlinx.coroutines.Dispatchers
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
+    val selected = MutableLiveData<Int>()
+
+    fun selectedMovie(id: Int) {
+        selected.value = id
+    }
+
     fun getMovie(id: Int) = liveData(Dispatchers.IO) {
         emit(Result.loading(data = null))
         try {
