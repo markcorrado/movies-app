@@ -7,8 +7,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.corrado.moviesapp.R
 import com.corrado.moviesapp.ui.main.api.ApiBuilder
 import com.corrado.moviesapp.ui.main.api.ApiHelper
@@ -20,14 +23,20 @@ class MainFragment : Fragment() {
     companion object {
         fun newInstance() = MainFragment()
         const val TAG = "MainFragment"
-
     }
 
     private lateinit var viewModel: MainViewModel
 
+    private var recyclerView: RecyclerView? = null
+    private var progressBar: ProgressBar? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.main_fragment, container, false)
+        val view = inflater.inflate(R.layout.main_fragment, container, false)
+        recyclerView = view.findViewById(R.id.recycler_view)
+        recyclerView?.layoutManager = LinearLayoutManager(context)
+        progressBar = view.findViewById(R.id.progress_bar)
+        return view
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -36,28 +45,25 @@ class MainFragment : Fragment() {
             this,
             ViewModelFactory(ApiHelper(ApiBuilder.apiService))
         ).get(MainViewModel::class.java)
-        viewModel.getMovie(11).observe(this, Observer {
+        viewModel.getPopularMovies().observe(this, Observer {
             it?.let { result ->
                 when (result.status) {
                     Status.SUCCESS -> {
-                        Log.e(TAG, "Success")
-
-                        result.data?.let { postMetadataList ->
-//                            postRecyclerView?.adapter = PostAdapter(postMetadataList)
-//                            progressBar?.visibility = View.GONE
-//                            postRecyclerViewlerView?.visibility = View.VISIBLE
+                        result.data?.let { movieList ->
+                            recyclerView?.adapter = movieList.results?.let { it1 -> MovieAdapter(it1) }
+                            progressBar?.visibility = View.GONE
+                            recyclerView?.visibility = View.VISIBLE
                         }
                     }
                     Status.ERROR -> {
-                        Log.e(TAG, "Failed to load postMetadata")
-//                        progressBar?.visibility = View.GONE
-//                        postRecyclerView?.visibility = View.VISIBLE
-//                        Toast.makeText(this, "There was an error loading blog posts. Try again later.", Toast.LENGTH_SHORT).show()
+                        Log.e(TAG, "Failed to load popular movies")
+                        progressBar?.visibility = View.GONE
+                        recyclerView?.visibility = View.VISIBLE
+                        Toast.makeText(context, "There was an error loading movies. Try again later.", Toast.LENGTH_SHORT).show()
                     }
                     Status.LOADING -> {
-                        Log.e(TAG, "Loading")
-//                        progressBar?.visibility = View.VISIBLE
-//                        postRecyclerView?.visibility = View.GONE
+                        progressBar?.visibility = View.VISIBLE
+                        recyclerView?.visibility = View.GONE
                     }
                 }
             }

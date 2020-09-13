@@ -16,4 +16,13 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
             emit(Result.error(data = null, message = exception.message ?: "Error getting Movie!"))
         }
     }
+
+    fun getPopularMovies() = liveData(Dispatchers.IO) {
+        emit(Result.loading(data = null))
+        try {
+            emit(Result.success(data = repository.getPopularMovies()))
+        } catch (exception: Exception) {
+            emit(Result.error(data = null, message = exception.message ?: "Error getting Popular Movies!"))
+        }
+    }
 }
