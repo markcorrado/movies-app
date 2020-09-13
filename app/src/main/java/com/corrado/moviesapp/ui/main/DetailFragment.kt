@@ -25,7 +25,7 @@ class DetailFragment : Fragment() {
     }
 
     private lateinit var viewModel: MainViewModel
-    val args by navArgs<DetailFragmentArgs>()
+    private val args by navArgs<DetailFragmentArgs>()
 
     private var titleTextView: TextView? = null
     private var bodyTextView: TextView? = null

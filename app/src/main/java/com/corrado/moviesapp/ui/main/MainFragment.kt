@@ -10,13 +10,13 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.corrado.moviesapp.R
 import com.corrado.moviesapp.ui.main.api.ApiBuilder
 import com.corrado.moviesapp.ui.main.api.ApiHelper
+import com.corrado.moviesapp.ui.main.api.model.Movie
 import com.corrado.moviesapp.ui.main.utils.Status
 import com.corrado.moviesapp.ui.main.utils.ViewModelFactory
 
@@ -47,17 +47,40 @@ class MainFragment : Fragment() {
             this,
             ViewModelFactory(ApiHelper(ApiBuilder.apiService))
         ).get(MainViewModel::class.java)
+        loadConfig()
+    }
+
+    private fun loadConfig() {
+        viewModel.getConfig().observe(viewLifecycleOwner, Observer {
+            it?.let { result ->
+                when (result.status) {
+                    Status.SUCCESS -> {
+                        loadMovies()
+                    }
+                    Status.ERROR -> {
+                        Log.e(TAG, "Failed to load config")
+                        Toast.makeText(context, "There was an error loading config. Try again later.", Toast.LENGTH_SHORT).show()
+                    }
+                    Status.LOADING -> {
+                        progressBar?.visibility = View.VISIBLE
+                        recyclerView?.visibility = View.GONE
+                    }
+                }
+            }
+        })
+    }
+
+    private fun loadMovies() {
         viewModel.getPopularMovies().observe(viewLifecycleOwner, Observer {
             it?.let { result ->
                 when (result.status) {
                     Status.SUCCESS -> {
-                        result.data?.let { movieList ->
-                            recyclerView?.adapter = movieList.results?.let { it1 -> MovieAdapter(it1) { movie ->
-                                val action = MainFragmentDirections.actionMainFragmentToDetailFragment(movie.id!!)
-                                this.findNavController().navigate(action)
-                            } }
-                            progressBar?.visibility = View.GONE
-                            recyclerView?.visibility = View.VISIBLE
+                        result.data?.let { popularMovieList ->
+                            viewModel.config?.let { config ->
+                                recyclerView?.adapter = MovieAdapter(popularMovieList.results!!, config) { movie -> movieClicked(movie)}
+                                progressBar?.visibility = View.GONE
+                                recyclerView?.visibility = View.VISIBLE
+                            }
                         }
                     }
                     Status.ERROR -> {
@@ -73,5 +96,10 @@ class MainFragment : Fragment() {
                 }
             }
         })
+    }
+
+    private fun movieClicked(movie: Movie) {
+        val action = MainFragmentDirections.actionMainFragmentToDetailFragment(movie.id!!)
+        this.findNavController().navigate(action)
     }
 }
