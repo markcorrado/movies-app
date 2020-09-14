@@ -31,6 +31,7 @@ class DetailFragment : Fragment() {
     private var bodyTextView: TextView? = null
     private var containerView: View? = null
     private var progressBar: ProgressBar? = null
+    private var genresTextView: TextView? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -39,6 +40,7 @@ class DetailFragment : Fragment() {
         bodyTextView = view.findViewById(R.id.body_textView)
         progressBar = view.findViewById(R.id.progress_bar)
         containerView = view.findViewById(R.id.container)
+        genresTextView = view.findViewById(R.id.genres_textView)
         return view
     }
 
@@ -49,27 +51,33 @@ class DetailFragment : Fragment() {
             this,
             ViewModelFactory(ApiHelper(ApiBuilder.apiService))
         ).get(MainViewModel::class.java)
-        viewModel.getMovie(movieId).observe(this.viewLifecycleOwner, Observer {
-            it?.let { result ->
-                when (result.status) {
-                    Status.SUCCESS -> {
-                        result.data?.let { movie ->
-                            containerView?.visibility = View.VISIBLE
-                            progressBar?.visibility = View.GONE
-                            titleTextView?.text = movie.title
-                            bodyTextView?.text = movie.overview
-                        }
-                    }
-                    Status.ERROR -> {
-                        Log.e(TAG, "Failed to load popular movies")
+
+        loadMovie(movieId)
+    }
+
+    private fun loadMovie(id: Int) {
+        viewModel.getMovie(id).observe(this.viewLifecycleOwner, Observer { result ->
+            when (result.status) {
+                Status.SUCCESS -> {
+                    result.data?.let { movie ->
+                        containerView?.visibility = View.VISIBLE
                         progressBar?.visibility = View.GONE
-                        Toast.makeText(context, "There was an error loading movies. Try again later.", Toast.LENGTH_SHORT).show()
-                    }
-                    Status.LOADING -> {
-                        progressBar?.visibility = View.VISIBLE
+                        titleTextView?.text = movie.title
+                        bodyTextView?.text = movie.overview
+                        //Getting just the name of the genre from genre list and separating with commas.
+                        genresTextView?.text = movie.genres?.map { it.name }?.joinToString(separator = ", ")
                     }
                 }
+                Status.ERROR -> {
+                    Log.e(TAG, "Failed to load movie")
+                    progressBar?.visibility = View.GONE
+                    Toast.makeText(context, "There was an error loading your movie. Try again later.", Toast.LENGTH_SHORT).show()
+                }
+                Status.LOADING -> {
+                    progressBar?.visibility = View.VISIBLE
+                }
             }
+
         })
     }
 }

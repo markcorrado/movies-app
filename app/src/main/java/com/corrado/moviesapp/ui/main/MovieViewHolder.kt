@@ -5,12 +5,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.corrado.moviesapp.R
-import com.corrado.moviesapp.ui.main.api.model.Config
-import com.corrado.moviesapp.ui.main.api.model.Movie
+import com.corrado.moviesapp.ui.main.api.model.ConfigModel
+import com.corrado.moviesapp.ui.main.api.model.MovieModel
 import com.squareup.picasso.Picasso
 
-class MovieViewHolder(itemView: View, private val config: Config) : RecyclerView.ViewHolder(itemView) {
-    var movie: Movie? = null
+class MovieViewHolder(itemView: View, private val configModel: ConfigModel) : RecyclerView.ViewHolder(itemView) {
+    var movieModel: MovieModel? = null
 
     private val titleTextView: TextView = itemView.findViewById(R.id.title_textView)
     private val moviePosterImageView: ImageView = itemView.findViewById(R.id.movie_poster_imageView)
@@ -18,14 +18,14 @@ class MovieViewHolder(itemView: View, private val config: Config) : RecyclerView
 //    private val summaryTextView: TextView = itemView.findViewById(R.id.summary_textView)
 //    private val dateTextView: TextView = itemView.findViewById(R.id.date_textView)
 
-    fun bind(movie: Movie) {
-        this.movie = movie
-        titleTextView.text = movie.title
+    fun bind(movieModel: MovieModel) {
+        this.movieModel = movieModel
+        titleTextView.text = movieModel.title
         val stringBuilder = StringBuilder()
-        stringBuilder.append(config.images?.base_url)
-        stringBuilder.append(config.images?.poster_sizes?.get(3))
-        stringBuilder.append(movie.poster_path)
-        
+        stringBuilder.append(configModel.images?.base_url)
+        stringBuilder.append(configModel.images?.poster_sizes?.get(3))
+        stringBuilder.append(movieModel.poster_path)
+
         Picasso.get().isLoggingEnabled = true
         Picasso
             .get()

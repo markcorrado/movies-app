@@ -1,6 +1,6 @@
 package com.corrado.moviesapp.ui.main.api.model
 
-class Config {
+class ConfigModel {
     var images: ImageData? = null
 }
 

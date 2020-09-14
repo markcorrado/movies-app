@@ -3,14 +3,14 @@ package com.corrado.moviesapp.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.corrado.moviesapp.ui.main.api.Repository
-import com.corrado.moviesapp.ui.main.api.model.Config
+import com.corrado.moviesapp.ui.main.api.model.ConfigModel
 import com.corrado.moviesapp.ui.main.utils.Result
-
 import kotlinx.coroutines.Dispatchers
+
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
 
-    var config: Config? = null
+    var configModel: ConfigModel? = null
 
     fun getMovie(id: Int) = liveData(Dispatchers.IO) {
         emit(Result.loading(data = null))
@@ -33,8 +33,8 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
     fun getConfig() = liveData(Dispatchers.IO) {
         emit(Result.loading(data = null))
         try {
-            config = repository.getConfig()
-            emit(Result.success(data = config))
+            configModel = repository.getConfig()
+            emit(Result.success(data = configModel))
         } catch (exception: Exception) {
             emit(Result.error(data = null, message = exception.message ?: "Error getting Config!"))
         }

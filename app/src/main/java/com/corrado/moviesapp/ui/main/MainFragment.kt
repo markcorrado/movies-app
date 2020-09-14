@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.corrado.moviesapp.R
 import com.corrado.moviesapp.ui.main.api.ApiBuilder
 import com.corrado.moviesapp.ui.main.api.ApiHelper
-import com.corrado.moviesapp.ui.main.api.model.Movie
+import com.corrado.moviesapp.ui.main.api.model.MovieModel
 import com.corrado.moviesapp.ui.main.utils.Status
 import com.corrado.moviesapp.ui.main.utils.ViewModelFactory
 
@@ -76,7 +76,7 @@ class MainFragment : Fragment() {
                 when (result.status) {
                     Status.SUCCESS -> {
                         result.data?.let { popularMovieList ->
-                            viewModel.config?.let { config ->
+                            viewModel.configModel?.let { config ->
                                 recyclerView?.adapter = MovieAdapter(popularMovieList.results!!, config) { movie -> movieClicked(movie)}
                                 progressBar?.visibility = View.GONE
                                 recyclerView?.visibility = View.VISIBLE
@@ -98,8 +98,8 @@ class MainFragment : Fragment() {
         })
     }
 
-    private fun movieClicked(movie: Movie) {
-        val action = MainFragmentDirections.actionMainFragmentToDetailFragment(movie.id!!)
+    private fun movieClicked(movieModel: MovieModel) {
+        val action = MainFragmentDirections.actionMainFragmentToDetailFragment(movieModel.id!!)
         this.findNavController().navigate(action)
     }
 }

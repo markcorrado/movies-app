@@ -1,6 +1,6 @@
 package com.corrado.moviesapp.ui.main.api.model
 
-class PopularMovieList {
+class PopularMovieListModel {
     var page: Int? = null
-    var results: List<Movie>? = null
+    var results: List<MovieModel>? = null
 }
