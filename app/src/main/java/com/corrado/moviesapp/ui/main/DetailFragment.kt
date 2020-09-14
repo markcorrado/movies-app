@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -15,8 +16,10 @@ import androidx.navigation.fragment.navArgs
 import com.corrado.moviesapp.R
 import com.corrado.moviesapp.ui.main.api.ApiBuilder
 import com.corrado.moviesapp.ui.main.api.ApiHelper
+import com.corrado.moviesapp.ui.main.api.model.MovieModel
 import com.corrado.moviesapp.ui.main.utils.Status
 import com.corrado.moviesapp.ui.main.utils.ViewModelFactory
+import com.squareup.picasso.Picasso
 
 class DetailFragment : Fragment() {
 
@@ -32,6 +35,7 @@ class DetailFragment : Fragment() {
     private var containerView: View? = null
     private var progressBar: ProgressBar? = null
     private var genresTextView: TextView? = null
+    private var moviesImageView: ImageView? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -41,6 +45,7 @@ class DetailFragment : Fragment() {
         progressBar = view.findViewById(R.id.progress_bar)
         containerView = view.findViewById(R.id.container)
         genresTextView = view.findViewById(R.id.genres_textView)
+        moviesImageView = view.findViewById(R.id.movie_imageView)
         return view
     }
 
@@ -48,7 +53,7 @@ class DetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val movieId = args.movieId
         viewModel = ViewModelProviders.of(
-            this,
+            requireActivity(),
             ViewModelFactory(ApiHelper(ApiBuilder.apiService))
         ).get(MainViewModel::class.java)
 
@@ -60,12 +65,7 @@ class DetailFragment : Fragment() {
             when (result.status) {
                 Status.SUCCESS -> {
                     result.data?.let { movie ->
-                        containerView?.visibility = View.VISIBLE
-                        progressBar?.visibility = View.GONE
-                        titleTextView?.text = movie.title
-                        bodyTextView?.text = movie.overview
-                        //Getting just the name of the genre from genre list and separating with commas.
-                        genresTextView?.text = movie.genres?.map { it.name }?.joinToString(separator = ", ")
+                        updateUIWithMovie(movie)
                     }
                 }
                 Status.ERROR -> {
@@ -77,7 +77,27 @@ class DetailFragment : Fragment() {
                     progressBar?.visibility = View.VISIBLE
                 }
             }
-
         })
+    }
+
+    private fun updateUIWithMovie(movieModel: MovieModel) {
+        containerView?.visibility = View.VISIBLE
+        progressBar?.visibility = View.GONE
+        titleTextView?.text = movieModel.title
+        bodyTextView?.text = movieModel.overview
+        //Getting just the name of the genre from genre list and separating with commas.
+        genresTextView?.text = movieModel.genres?.map { it.name }?.joinToString(separator = ", ")
+        val stringBuilder = StringBuilder()
+        viewModel.configModel?.let { config ->
+            stringBuilder.append(config.images?.base_url)
+            stringBuilder.append(config.images?.poster_sizes?.get(1))
+            stringBuilder.append(movieModel.backdropPath)
+        }
+        Picasso
+            .get()
+            .load(stringBuilder.toString())
+            .fit()
+            .centerCrop()
+            .into(moviesImageView)
     }
 }

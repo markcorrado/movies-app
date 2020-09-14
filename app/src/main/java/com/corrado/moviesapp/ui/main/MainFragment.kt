@@ -23,7 +23,6 @@ import com.corrado.moviesapp.ui.main.utils.ViewModelFactory
 class MainFragment : Fragment() {
 
     companion object {
-        fun newInstance() = MainFragment()
         const val TAG = "MainFragment"
     }
 
@@ -44,7 +43,7 @@ class MainFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(
-            this,
+            requireActivity(),
             ViewModelFactory(ApiHelper(ApiBuilder.apiService))
         ).get(MainViewModel::class.java)
         loadConfig()
