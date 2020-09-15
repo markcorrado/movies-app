@@ -20,6 +20,8 @@ class MovieViewHolder(itemView: View, private val configModel: ConfigModel) : Re
         titleTextView.text = movieModel.title
         val stringBuilder = StringBuilder()
         stringBuilder.append(configModel.images?.base_url)
+        //Just getting the largest image for now.
+        //Maybe I should just pass "original"?
         stringBuilder.append(configModel.images?.poster_sizes?.last())
         stringBuilder.append(movieModel.posterPath)
         Picasso
