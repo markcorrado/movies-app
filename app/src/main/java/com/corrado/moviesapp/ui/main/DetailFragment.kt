@@ -90,14 +90,14 @@ class DetailFragment : Fragment() {
         val stringBuilder = StringBuilder()
         viewModel.configModel?.let { config ->
             stringBuilder.append(config.images?.base_url)
-            stringBuilder.append(config.images?.poster_sizes?.get(1))
+            stringBuilder.append(config.images?.poster_sizes?.get(3))
             stringBuilder.append(movieModel.backdropPath)
         }
         Picasso
             .get()
             .load(stringBuilder.toString())
             .fit()
-            .centerCrop()
+            .centerInside()
             .into(moviesImageView)
     }
 }
