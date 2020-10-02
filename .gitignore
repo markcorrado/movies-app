@@ -86,3 +86,4 @@ lint/tmp/
 /secrets.properties
 /.idea/gradle.xml
 /.idea/misc.xml
+/.idea/compiler.xml
