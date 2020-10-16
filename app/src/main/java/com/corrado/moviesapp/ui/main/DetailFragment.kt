@@ -19,6 +19,7 @@ import com.corrado.moviesapp.ui.main.api.ApiHelper
 import com.corrado.moviesapp.ui.main.api.model.MovieModel
 import com.corrado.moviesapp.ui.main.utils.Status
 import com.corrado.moviesapp.ui.main.utils.ViewModelFactory
+import com.corrado.shared.Greeting
 import com.squareup.picasso.Picasso
 
 class DetailFragment : Fragment() {
@@ -84,7 +85,7 @@ class DetailFragment : Fragment() {
         containerView?.visibility = View.VISIBLE
         progressBar?.visibility = View.GONE
         titleTextView?.text = movieModel.title
-        bodyTextView?.text = movieModel.overview
+        bodyTextView?.text = Greeting().greeting()
         //Getting just the name of the genre from genre list and separating with commas.
         genresTextView?.text = movieModel.genres?.map { it.name }?.joinToString(separator = ", ")
         val stringBuilder = StringBuilder()
