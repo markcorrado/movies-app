@@ -3,12 +3,12 @@ package com.corrado.moviesapp.ui.main.api.model
 import com.google.gson.annotations.SerializedName
 
 class MovieModel {
-    var id: Int? = null
-    var title: String? = null
-    var overview: String? = null
+    var id: Int = 0
+    var title: String = ""
+    var overview: String = ""
     @SerializedName("poster_path")
-    var posterPath: String? = null
+    var posterPath: String = ""
     @SerializedName("backdrop_path")
-    var backdropPath: String? = null
+    var backdropPath: String = ""
     var genres: List<GenreModel>? = null
 }
